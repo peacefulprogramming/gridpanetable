@@ -1,7 +1,7 @@
 /**
  *
  *   BS"D
- *
+ *   GridPaneTable data table component.
  */
 
 var GridPaneTable = {};
@@ -439,6 +439,7 @@ GridPaneTable.Table = React.createClass({
 	  this.maxHeight = this.props.rowHeight * this.props.numRows;
   	  this.columns = [];
 	  this.maxWidth = 0;
+	  this.optionsLink = null;
   	  for (var cc=0; cc<this.props.columns.length; cc++) {
   	  		var column = this.props.columns[cc];
   	  		var cloneColumn = {
@@ -522,8 +523,13 @@ GridPaneTable.Table = React.createClass({
   	me.body.setState({custom: true});
   	var body = me.service.getBody();
   	var header = me.service.getHeader();
-  	me.element.style.width = me.props.minWidth + "px";
   	var maxWidth = me.maxWidth + 15;
+  	if (me.props.minWidth && me.props.minWidth!=null && me.props.minWidth>0) {
+  		me.element.style.width = me.props.minWidth + "px";
+  	}
+  	else {
+  		me.element.style.width = maxWidth + "px";
+  	}
   	var pRect = me.element.parentElement.getBoundingClientRect();
   	var custom = true;
   	var currentWidth = pRect.width;
@@ -532,15 +538,19 @@ GridPaneTable.Table = React.createClass({
   	//}
   	if (pRect.width > maxWidth) {
   		custom = false;
-  	  	me.element.style.width = currentWidth + "px";
+  		if (me.props.minWidth && me.props.minWidth!=null && me.props.minWidth>0) {
+			me.element.style.width = currentWidth + "px";
+		}
  	  	//me.element.style.width = this.maxWidth + "px";
  	  	header.style.width = "";
   	}
   	else {
-  	  	me.element.style.width = me.minWidth + "px";
-  	  	if (pRect.width > me.props.minWidth) {
-  	  		me.element.style.width = pRect.width + "px";
-  	  	}
+  		if (me.props.minWidth && me.props.minWidth!=null && me.props.minWidth>0) {
+			me.element.style.width = me.props.minWidth + "px";
+			if (pRect.width > me.props.minWidth) {
+				me.element.style.width = pRect.width + "px";
+			}
+		}
   	}
   	if (me.props.tableHeight && me.props.tableHeight!=null && me.props.tableHeight>0) {
   	  	body.style.height = (me.props.tableHeight - me.headerRowHeight) + "px";
@@ -559,7 +569,9 @@ GridPaneTable.Table = React.createClass({
   	me.setState({custom: custom});
   	me.header.setState({custom: custom, defaultWidth: me.maxWidth, width: currentWidth});
   	me.body.setState({custom: custom, defaultWidth: me.maxWidth, width: currentWidth});
-  	me.optionsLink.moveOptions(pRect.right - 16);
+  	if (me.optionsLink && me.optionsLink!=null) {
+  		me.optionsLink.moveOptions(pRect.right - 16);
+  	}
   	me.service.onScroll(me.element, custom);
   	  
   },
@@ -606,5 +618,3 @@ GridPaneTable.Table = React.createClass({
   	window.removeEventListener("resize", this.resizeMe);
   }
 });
-
-
