@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+BS"D
+-->
+<html>
+    <head>
+        <title>Table Test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/gridpanetable.css">
+        <link rel="stylesheet" href="css/testtable.css">
+        <script src ="node_modules/react/dist/react.js"></script>
+        <script src ="node_modules/react-dom/dist/react-dom.js"></script>
+    </head>
+    <body style="height: 100%;">
+        <div id="appHeader">Table Test</div>
+        <div id="content">
+        	<div style="float: left; width: 10%;">
+        		Lorem Ipsum dolor sit supercalifragilisticexpialidocious
+        	</div>
+        	<div style="float: left; width: 90%;" id="gridcell">Loading ...</div>
+        </div>
+        
+        <!--script src="table.js"></script-->
+        <script src="gridpanetable.js"></script>
+        <script type="text/javascript">
+        var numRows = 30;
+        var columns = [];
+        var ageColumn = 4;
+        var numColumns = 7;
+        var tableData = [];
+        for (var rr=0; rr<numRows; rr++) {
+        	var row = [];
+        	for (var cc=0; cc<numColumns; cc++) {
+        		var cell = {value: "foo " + rr + "-" + cc};
+        		if ((cc % 3)==0 && (rr % 4)==0) {
+        			for (var ww=0; ww<10; ww++) {
+        				cell.value = cell.value + " more words ";
+        			}
+        		}
+        		if (cc==ageColumn) {
+        			cell.value = Math.floor(120*Math.random());
+        		}
+        		row.push(cell);
+        	}
+        	tableData.push(row);
+        }
+        var RightDiv = React.createClass({
+        	render: function() {
+        		return (
+        			React.createElement("div", {className: "testtable-right"}, this.props.value)
+        		)
+        	}
+        });
+        function getCell(arg) {
+        	return tableData[arg.rowIndex][arg.columnIndex][arg.column.property];
+       	}
+       	function getAge(arg) {
+       		var age = getCell(arg);
+       		return React.createElement(RightDiv, {value: age}, null);
+       	}
+       	
+       	var sortableTable = null;
+       	function compareAge(rec1, rec2) {
+       		var qA = rec1[ageColumn].value;
+       		var qB = rec2[ageColumn].value;
+       		if (qA < qB) {
+       			return -1;
+       		}
+       		if (qA > qB) {
+       			return 1;
+       		}
+       		return 0;
+       	}
+       	
+       	function compareAgeR(rec1, rec2) {
+       		var qA = rec1[ageColumn].value;
+       		var qB = rec2[ageColumn].value;
+       		if (qB < qA) {
+       			return -1;
+       		}
+       		if (qB > qA) {
+       			return 1;
+       		}
+       		return 0;
+       	}
+       	
+       	function sortData(dir) {
+       		if (dir == "UP") {
+       			tableData.sort(compareAge);
+       		}
+       		if (dir == "DOWN") {
+       			tableData.sort(compareAgeR)
+       		}
+       	}
+       	
+       	var AgeHeader = React.createClass({
+       		getInitialState: function() {
+       			return {indicator: ""};
+       		},
+       		sort: function() {
+       			if (!this.sortDir || this.sortDir==null || this.sortDir == "DOWN") {
+       				this.sortDir = "UP";
+       				this.setState({indicator: "+"});
+       			}
+       			else {
+       				this.sortDir = "DOWN"
+       				this.setState({indicator: "-"});
+       			}
+       			sortableTable.updateSort(this.sortDir);
+       		},
+       		render: function() {
+       			return (
+       				React.createElement("span", {onClick: this.sort},
+       					"Age ", this.state.indicator)
+       			)
+       		}
+       	});
+
+       	for (var cc=0; cc<numColumns; cc++) {
+       		var colName = "Column " + cc;
+       		var column = {referenceName: colName, displayName: colName, property: "value", width: 150, cellContentGetter: getCell};
+       		if (cc == 4) {
+       			column.referenceName = "Age";
+       			column.displayName = React.createElement(AgeHeader, {}, null);
+       			column.cellContentGetter = getAge;
+       		}
+       		columns.push(column);
+       	}
+       	columns[0].fixed = true;
+       	columns[0].noHide = true;
+       	columns[1].fixed = true;
+       	
+       	columns[numColumns - 1].fixedRight = true;
+       	var SortableTable = React.createClass({
+       		getInitialState: function () {
+       			sortableTable = this;
+       			return {sort: "none", columns: columns};
+       		},
+       		updateSort: function(dir) {
+       			sortData(dir);
+       			this.setState({sort: dir});
+       		},
+       		render: function() {
+       			return (
+					React.createElement(GridPaneTable.Table, 
+						{
+							columns: columns
+							,caption: true
+							,minWidth: 350
+							,sortDir: this.state.sort
+							//,tableHeight: 250
+							,numRows: tableData.length
+							,verticalResizer: {remainingHeight: 40, minHeight: 250}
+							,headerRowHeight: 40
+							//,rowHeight: 60
+							,headerClass: "testtable-header"
+							,evenClass: "testtable-even"
+							,oddClass: "testtable-odd"
+						})
+       			)
+       		}
+       	})
+        	ReactDOM.render(
+        		React.createElement(SortableTable, {})
+        		,document.getElementById("gridcell")
+        	);
+        </script>
+    </body>
+</html>
