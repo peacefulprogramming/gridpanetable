@@ -10,6 +10,7 @@
   "license": "ISC",
   "devDependencies": {
     "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+    "react-dom": "^15.4.1",
+    "uglify-js": "^2.7.5"
   }
 }
