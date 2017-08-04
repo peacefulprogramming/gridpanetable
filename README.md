@@ -20,6 +20,8 @@ Grid-Pane Table is a light-weight data table widget .
  
 Currently it is only available for React. An Angular version may be developed in the future.
 
+See working version of the [demo](https://peacefulprogramming.github.io/gridpanetable/tabletest.html) from this repository.
+
 ## Installation and Usage
 
 Only requires the gridpanetable.js and gridpanetable.css files included in this repository.
@@ -64,11 +66,11 @@ To use the component, include the following line in your code (or use JSX):
 
 The cell getter should be a function of the format
 
-`
+``````javascript
 	 function myCellGetter(arg) {
 	 ...
 	}
-`
+```````
 
 where `arg` has the following properties
 
