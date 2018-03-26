@@ -11,24 +11,24 @@ Grid-Pane Table is a light-weight data table widget .
  + Customizable striping
  + Fixed left and right columns
  + Separately customizable header and row heights
- 
+
  The following features will not be included because they are easily added by the user and are not general enough
- 
- + Sorting - there are too many data types to include all of them in a widget. An example of how the user can contol sorting is shown in the example. 
+
+ + Sorting - there are too many data types to include all of them in a widget. An example of how the user can contol sorting is shown in the example.
  + Column Filtering - Similar to sorting, this is a custom function that depends on the data type of the column.
   + In-line editing - again there are too many data types  for all of them to be included in the widget. This can also be implemented by the user in the cell getter function.
- 
+
 Currently it is only available for React. An Angular version may be developed in the future.
 
 See working version of the [demo](https://peacefulprogramming.github.io/gridpanetable/tabletest.html) from this repository.
 
 ## Installation and Usage
 
-Only requires the gridpanetable.js and gridpanetable.css files included in this repository.
+Only requires the gridpanetable.min.js and gridpanetable.css files included in this repository.
 
-To use the component, include the following line in your code (or use JSX): 
+To use the component, include the following line in your code
 
-	React.createElement(GridPaneTable.Table, options)
+	<GridPaneTableTable {options}></GridPaneTableTable>
 
 ## API
 
@@ -42,13 +42,13 @@ To use the component, include the following line in your code (or use JSX):
  + numRows - (**required**)  the number of rows of data
  + minWidth - (optional) A `number` If set, the table will resize with the window down to the given width (in pixels). The table will attempt to fill its parent component, so it's parent component's width should probably be set in some way.  If the table is smaller than the sum of the columns, horizontal scrolling will automatically be enabled. If not set, the table will be a constant width that is the sum of the column widths.
  + verticalResizer - (optional) - a `VerticalResizer` object. If set enables vertical scrolling. If not set, all rows are visible, and the window is the scroller
- 
+
  ### Caption
- 
+
  + title - a `String` or React Element will be placed in the top center of the table
- 
+
  ### Column
- 
+
 + cellContentGetter - (**required**) a `function` to get a cell's content. The properties of the argument sent are described below.
 + referenceName, displayName (one is **required**) - Only one of these values is required. If one is missing, the other will be used. The difference is what is used by default for various purposes. The list of column options to turn on and off (if the caption is enabled) by default uses the `referenceName` property, so it is usually just a `String`. By contrast, the content of the header cell will default to the `displayName` property, so it could be a React Element. This is useful, where the header is complicated (*e.g.* to allow for sorting), but still want the ability turn it off or on.
 + width - (**required**) the minimum width of the column

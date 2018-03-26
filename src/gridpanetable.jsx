@@ -4,33 +4,36 @@
  *   GridPaneTable data table component.
  */
 
-var GridPaneTable = {};
+
+var GridPaneTable = function() {};
 GridPaneTable.DEFAULT_ROW_HEIGHT = 0;
 GridPaneTable.WHITE_SPACE = "\u00a0";
 
 
+class GridPaneTableService {
 
-GridPaneTable.Service = function () {
-	this.header = null;
-	this.body = null;
-	
-	this.setHeader = function(hdr) {
+	constructor() {
+		this.header = null;
+		this.body = null;
+	}
+
+	setHeader(hdr) {
 		this.header = hdr;
 	}
-	
-	this.getHeader = function() {
+
+	getHeader() {
 		return this.header;
 	}
-	
-	this.setBody = function(bdy) {
+
+	setBody(bdy) {
 		this.body = bdy;
 	}
-	
-	this.getBody = function() {
+
+	getBody() {
 		return this.body;
 	}
-	
-	this.onScroll = function(tbl, custom) {
+
+	onScroll(tbl, custom) {
 		var header = this.getHeader();
 		var body = this.getBody();
 		var rect = header.getBoundingClientRect();
@@ -58,14 +61,17 @@ GridPaneTable.Service = function () {
   	 		}
   	 	}
 	}
-	
-};
 
-GridPaneTable.Cell = React.createClass({
-  setElement: function(elt) {
+}
+
+class GridPaneTableCell extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+  setElement(elt) {
   	  this.element = elt;
-  },
-  getCellClass: function () {
+  }
+  getCellClass() {
   	var clazz = "gridpanetable-cell";
   	if (this.props.custom) {
   		clazz = clazz + " gridpanetable-cell-scroll";
@@ -77,39 +83,39 @@ GridPaneTable.Cell = React.createClass({
   	  	}
   	}
   	return clazz;
-  },
-  setStyles: function() {
-  	  if (this.props.custom) {
-  	  	this.element.style.width = "";
-  	  	this.element.style.minWidth = this.props.column.width + "px";
-  	  	this.element.style.maxWidth = this.props.column.width + "px";
-  	  	if (!this.props.column.fixedRight) {
-  	  		this.element.style.left = this.props.column.left + "px";
-  	  	}
-  	  	else {
-  	  		this.element.style.left = "";
-  	  		if (this.props.cellType.toUpperCase() == "TH") {
-  	 			rect = this.element.getBoundingClientRect();
-  	 			this.element.style.width = (rect.width + 10) + "px";
-  	 			this.element.style.maxWidth = (rect.width + 10) + "px";
-  	  		}
-  	  	}
-  	  }
-  	  else {
-  	  	this.element.style.minWidth = "";
- 	  	this.element.style.transform = "";
- 	  	this.element.style.maxWidth = "";
-  	  	var w = this.props.totalWidth*this.props.column.width/this.props.defaultTotalWidth
-  	  	this.element.style.minWidth = w + "px";
-  	  }
-  	  if (this.props.height>0) {
-  	  	this.element.style.height = this.props.height + "px";
-  	  }
+  }
+  setStyles() {
+	  if (this.props.custom) {
+	  	this.element.style.width = "";
+	  	this.element.style.minWidth = this.props.column.width + "px";
+	  	this.element.style.maxWidth = this.props.column.width + "px";
+	  	if (!this.props.column.fixedRight) {
+	  		this.element.style.left = this.props.column.left + "px";
+	  	}
+	  	else {
+	  		this.element.style.left = "";
+	  		if (this.props.cellType.toUpperCase() == "TH") {
+		 			var rect = this.element.getBoundingClientRect();
+		 			this.element.style.width = (rect.width + 10) + "px";
+		 			this.element.style.maxWidth = (rect.width + 10) + "px";
+		  	}
+	  	}
+	  }
+	  else {
+	  	this.element.style.minWidth = "";
+	  	this.element.style.transform = "";
+	  	this.element.style.maxWidth = "";
+	  	var w = this.props.totalWidth*this.props.column.width/this.props.defaultTotalWidth
+	  	this.element.style.minWidth = w + "px";
+	  }
+	  if (this.props.height>0) {
+	  	this.element.style.height = this.props.height + "px";
+	  }
   	  //if (this.props.column.transparent) {
   	  //	this.element.style.opacity = 0.5;
   	  //}
-  },
-  getCellContent: function() {
+  }
+  getCellContent() {
   	  if (this.props.cellType == "th") {
   	  	  return this.props.cellContent;
   	  }
@@ -119,35 +125,33 @@ GridPaneTable.Cell = React.createClass({
   	  	  	  ,columnIndex: this.props.columnIndex
   	  	  	  ,column: this.props.column
   	  	  	  ,row: this.props.parentRow
-  	  	  	  ,cell: this.element  	  	  	  
+  	  	  	  ,cell: this.element
   	  	  }
   	  	  return this.props.cellContent(arg);
   	  }
-  },
-  componentDidMount: function() {
-  	this.setStyles();
-  },
-  componentDidUpdate: function() {
-  	this.setStyles();
-  },
-  render: function() {
-  	  return (
-  	  	  React.createElement(this.props.cellType, 
-  	  	  	  {ref: this.setElement, className: this.getCellClass()},
-  	  	  	  this.getCellContent()
-  	  	  )
-  	  )
   }
-});
+  componentDidMount() {
+  	this.setStyles();
+  }
+  componentDidUpdate() {
+  	this.setStyles();
+  }
+  render() {
+		var cell = this;
+		return React.createElement(this.props.cellType,
+  	  {ref: function(elt) { cell.setElement(elt); }, className: this.getCellClass()},
+  	  this.getCellContent());
+  }
+}
 
-GridPaneTable.Row = React.createClass({
-  createColumns: function() {
+class GridPaneTableRow extends React.Component {
+  createColumns() {
   	  var columns = [];
   	  for (var cc=0; cc<this.props.columns.length; cc++) {
   	  	var columnKey = "col" + cc;
   	  	var column = this.props.columns[cc];
   	  	var cellContent = null;
-  	  	cellType = "";
+  	  	var cellType = "";
   	  	if (this.props.isHeader) {
   	  		cellContent = GridPaneTable.WHITE_SPACE;
   	  		if (column.displayName) {
@@ -172,7 +176,7 @@ GridPaneTable.Row = React.createClass({
   	  			transparent: true
   	  		};
 			columns.push(
-			React.createElement(GridPaneTable.Cell,
+			React.createElement(GridPaneTableCell,
 						{key: columnKey + "H", cellType: cellType, height: this.props.height,
 							rowParent: this.element, columnIndex: cc, rowIndex: this.props.rowIndex,
 							cellContent: cellContent, column: cloneColumn, custom: this.props.custom,
@@ -183,7 +187,7 @@ GridPaneTable.Row = React.createClass({
   	  	}
   	  	if (column.display) {
 		   columns.push(
-		   React.createElement(GridPaneTable.Cell,
+		   React.createElement(GridPaneTableCell,
 					{key: columnKey, cellType: cellType, height: this.props.height,
 						rowParent: this.element, columnIndex: cc, rowIndex: this.props.rowIndex,
 						cellContent: cellContent, column: column, custom: this.props.custom,
@@ -194,11 +198,11 @@ GridPaneTable.Row = React.createClass({
   	  	}
   	  }
   	  return columns;
-  },
-  setElement: function(elt) {
+  }
+  setElement(elt) {
   	this.element = elt;
-  },
-  setStyles: function () {
+  }
+  setStyles() {
   	if (this.props.height>0) {
   		this.element.style.height = this.props.height + "px";
   	}
@@ -210,40 +214,43 @@ GridPaneTable.Row = React.createClass({
   		//this.element.style.width = this.props.totalWidth + "px";
   		this.element.style.width = "100%";
   	}
-  },
-  componentDidMount: function() {
+  }
+  componentDidMount() {
   	this.setStyles();
-  },
-  componentDidUpdate: function() {
+  }
+  componentDidUpdate() {
   	this.setStyles();
-  },
-  render: function() {
+  }
+  render() {
   	  return (
-  	  	  React.createElement("tr", {ref: this.setElement, className: this.props.rowClass}, this.createColumns())
+  	  	  <tr ref={(elt) => this.setElement(elt)} className={this.props.rowClass}>
+						{this.createColumns()}
+					</tr>
   	  )
   }
-});
+}
 
-GridPaneTable.Body = React.createClass({
-	getBodyClass: function() {
+class GridPaneTableBody extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {custom: true}
+	}
+	getBodyClass() {
 		var clazz = "gridpanetable-body";
 		if (this.state.custom) {
 			clazz += " gridpanetable-body-scroll";
 		}
 		return clazz;
-	},
-	getInitialState: function () {
-		return {custom: true}
-	},
-	setVScroll: function (elt) {
+	}
+	setVScroll(elt) {
 		this.element = elt;
 		this.props.service.setBody(elt);
-	},
-   createRows: function(custom) {
+	}
+  createRows(custom) {
   	  var rows = [];
   	  var rr = 0;
   	  var columns = this.props.columns;
-	  var props = this.props.rowProps;
+	  	var props = this.props.rowProps;
   	  for (var rr=0; rr<props.numRows; rr++) {
   	  	var rowClass = props.rowClass;
   	  	if (props.evenClass && props.evenClass!=null && props.evenClass.length>0 && ((rr % 2) == 0)) {
@@ -253,8 +260,8 @@ GridPaneTable.Body = React.createClass({
   	  		rowClass = rowClass + " " + props.oddClass;
   	  	}
   	   rows.push(
-  	      	  React.createElement(GridPaneTable.Row,
-  	      	  	  {columns: columns, key: "row" + rr, rowIndex: rr, height: props.rowHeight, 
+  	      	  React.createElement(GridPaneTableRow,
+  	      	  	  {columns: columns, key: "row" + rr, rowIndex: rr, height: props.rowHeight,
   	      	  	  rowClass: rowClass, custom: this.state.custom,
   	      	  	  defaultWidth: this.state.defaultWidth, width: this.state.width},
   	      	  	  null
@@ -262,96 +269,99 @@ GridPaneTable.Body = React.createClass({
   	   );
   	  }
   	  return rows;
-   },
-  componentDidMount: function () {
+   }
+   componentDidMount() {
   		if (this.props.height>0) {
   			this.element.style.height = this.props.height + "px";
   		}
-  },
-  render: function () {
+  }
+  render() {
 		return (
-			React.createElement("tbody", {ref: this.setVScroll, className: this.getBodyClass()}, this.createRows(this.state.custom))
+			<tbody ref={(elt) => this.setVScroll(elt)} className={this.getBodyClass()}>
+				{this.createRows(this.state.custom)}
+			</tbody>
 		)
 	}
-});
+}
 
-GridPaneTable.Header = React.createClass({
-	getInitialState: function () {
-		return {custom: true}
-	},
-   setElement: function(elt) {
+class GridPaneTableHeader extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {custom: true};
+	}
+  setElement(elt) {
   		this.element = elt;
   		this.props.service.setHeader(elt);
-   },
-	getHeaderClass: function() {
+  }
+	getHeaderClass() {
 		var clazz = "gridpanetable-head";
 		if (this.state.custom) {
 			clazz += " gridpanetable-head-scroll";
 		}
 		return clazz;
-	},
-	render: function () {
+	}
+	render() {
 		return (
-  	   	React.createElement("thead", {className: this.getHeaderClass(), ref: this.setElement}, 
-				React.createElement(GridPaneTable.Row,
-					{columns: this.props.columns, height: this.props.height, rowClass: this.props.headerClass,
-					isHeader: true,
-					 custom: this.state.custom, defaultWidth: this.state.defaultWidth, width: this.state.width}, null
-				)
-  	      )
+  		<thead className={this.getHeaderClass()} ref={(elt) => this.setElement(elt)}>
+				<GridPaneTableRow
+					columns={this.props.columns} height={this.props.height}
+					 rowClass={this.props.headerClass} isHeader="true"
+					 custom={this.state.custom}
+					 defaultWidth={this.state.defaultWidth} width={this.state.width}>
+				</GridPaneTableRow>
+			</thead>
 		)
 	}
-});
+}
 
-GridPaneTable.ColumnOption = React.createClass({
-	getDisplayName: function() {
+class GridPaneTableColumnOption extends React.Component {
+	getDisplayName() {
 		if (this.props.column.referenceName) {
 			return this.props.column.referenceName;
 		}
 		else {
 			return this.props.column.displayName;
 		}
-	},
-	getLabelClass: function() {
+	}
+	getLabelClass() {
 		var clazz = "";
 		if (this.props.column.noHide) {
 			clazz = "gridpanetable-disabled";
 		}
 		return clazz;
-	},
-	componentDidMount: function() {
+	}
+	componentDidMount() {
 		if (this.props.column.display) {
 			this.element.checked = true;
 		}
-    },
-  	setElement: function(elt) {
-  	  this.element = elt;
-  	},
-  	handleChange: function() {
-  		var chk = this.element.checked;
-  		this.props.gpTable.updateColumn(this.props.columnIndex, chk);
-  	},
-    render: function() {
-    	return (
-    		React.createElement("div", {className: "gridpanetable-option"}, 
-    			React.createElement("input", {type: "checkbox", ref: this.setElement
-    				,disabled: this.props.column.noHide
-    				,onChange: this.handleChange}, null)
-    			,GridPaneTable.WHITE_SPACE
-    			,React.createElement("span", {className: this.getLabelClass()}
-    				,this.getDisplayName())
-    		)
-    	)
-    }
-});
+  }
+  setElement(elt) {
+	  this.element = elt;
+	}
+	handleChange() {
+		var chk = this.element.checked;
+		this.props.gpTable.updateColumn(this.props.columnIndex, chk);
+	}
+  render() {
+  	return (
+  		<div className="gridpanetable-option">
+				<input type="checkbox" ref={(elt) => this.setElement(elt)}
+  				disabled={this.props.column.noHide}
+  				onChange={ (evt) => {return this.handleChange(evt) }}></input>
+				{GridPaneTable.WHITE_SPACE}
+  			<span className={this.getLabelClass()}>{this.getDisplayName()}</span>
+			</div>
+  	)
+  }
+}
 
-
-GridPaneTable.OptionsLink = React.createClass({
-	getInitialState: function() {
+class GridPaneTableOptionsLink extends React.Component {
+	constructor(props) {
+		super(props);
 		this.props.gpTable.optionsLink = this;
-		return {optionsDisplayed: "none"};
-	},
-	showOptions: function(evt, evtArg) {
+		this.state = {optionsDisplayed: "none"};
+	}
+	showOptions(evt, evtArg) {
 		var optionsState = this.state.optionsDisplayed;
 		if (optionsState == "none") {
 			optionsState = "block";
@@ -359,23 +369,23 @@ GridPaneTable.OptionsLink = React.createClass({
 		else {
 			optionsState = "none";
 		}
-		this.setState({optionsDisplayed: optionsState, 
-			otionsRight: evt.clientX, optionsTop: evt.clientY});
-	},
-	moveOptions: function(newRight) {
+		this.setState({optionsDisplayed: optionsState,
+			optionsRight: evt.clientX, optionsTop: evt.clientY});
+	}
+	moveOptions(newRight) {
 		var optionsState = this.state.optionsDisplayed;
 		if (this.state.optionsDisplayed == "block") {
-			this.setState({optionsDisplayed: optionsState, 
-				otionsRight: newRight, optionsTop: this.state.optionsTop});
+			this.setState({optionsDisplayed: optionsState,
+				optionsRight: newRight, optionsTop: this.state.optionsTop});
 		}
-	},
-	setOptionsDisplay: function(elt) {
+	}
+	setOptionsDisplay(elt) {
 		this.optionsDisplay = elt;
-	},
-	createColumnOptions: function() {
+	}
+	createColumnOptions() {
 		var columnOptions = [];
 		for (var cc=0; cc<this.props.columns.length; cc++) {
-			var columnOption = React.createElement(GridPaneTable.ColumnOption,
+			var columnOption = React.createElement(GridPaneTableColumnOption,
 				{key: "colOpt" + cc
 				,column: this.props.columns[cc], columnIndex: cc
 				,gpTable: this.props.gpTable}
@@ -383,43 +393,74 @@ GridPaneTable.OptionsLink = React.createClass({
 			columnOptions.push(columnOption);
 		}
 		return columnOptions;
-	},
-	componentDidUpdate: function() {
+	}
+	componentDidUpdate() {
 		this.optionsDisplay.style.display = this.state.optionsDisplayed;
 		var rect = this.optionsDisplay.getBoundingClientRect();
-		if (this.state.optionsDisplayed == "block") {
-			this.optionsDisplay.style.left = (this.state.otionsRight - rect.width) + "px";
+		var optionsLeft = this.state.optionsRight - rect.width;
+		if (optionsLeft<0) {
+			optionsLeft = 0;
 		}
-	},
-    render: function() {
-    	return (
-    		React.createElement("span", {},
-    			React.createElement("span", {onClick: this.showOptions, className: "gridpanetable-options-link"}, "⚙")
-    			,React.createElement("div", {className: "gridpanetable-options", ref: this.setOptionsDisplay},
-    				this.createColumnOptions()
-    			)
-    		)
-    	)
-    }
-});
+		if (this.state.optionsDisplayed == "block") {
+			this.optionsDisplay.style.left = optionsLeft + "px";
+		}
+	}
+ render() {
+  	return (
+  		<span>
+  			<span className="gridpanetable-options-link"
+					onClick={(evt) => { return this.showOptions(evt) }}>
+  				{this.props.optionsTitle}
+  				<span className="gridpanetable-options-icon">⚙</span>
+  			</span>
+  			<div className="gridpanetable-options" ref={ (elt) => this.setOptionsDisplay(elt)}>
+  				{this.createColumnOptions()}
+  			</div>
+  		</span>
+  	)
+  }
+}
 
-GridPaneTable.Caption = React.createClass({
-	render: function() {
+class GridPaneTableCaption extends React.Component {
+	render() {
 		return (
-  	  		React.createElement("caption", {className: "gridpanetable-caption"},
-  	  			React.createElement("div", {className: "gridpanetable-caption-left"}, GridPaneTable.WHITE_SPACE)
-  	  			,React.createElement("div", {className: "gridpanetable-caption-center"}, this.props.title)
-  	  			,React.createElement("div", {className: "gridpanetable-caption-right"}, 
-  	  				React.createElement(GridPaneTable.OptionsLink, 
-  	  					{columns: this.props.columns, gpTable: this.props.gpTable}, null)
-  	  			)
-  	  		)
+  	  <caption className="gridpanetable-caption">
+  	  	<div className="gridpanetable-caption-left">{GridPaneTable.WHITE_SPACE}</div>
+	  		<div className="gridpanetable-caption-center">{this.props.title}</div>
+  			<div className="gridpanetable-caption-right">
+  				<GridPaneTableOptionsLink columns={this.props.columns} gpTable={this.props.gpTable}
+						optionsTitle={this.props.optionsTitle}>
+					</GridPaneTableOptionsLink>
+  			</div>
+  		</caption>
 		)
 	}
-});
+}
 
-GridPaneTable.Table = React.createClass({
-  getColumnPositions: function() {
+class GridPaneTableTable extends React.Component {
+	constructor(props) {
+		super(props);
+	  this.service = new GridPaneTableService();
+	  this.maxHeight = this.props.rowHeight * this.props.numRows;
+  	this.columns = [];
+	  this.maxWidth = 0;
+	  this.optionsLink = null;
+	  for (var cc=0; cc<this.props.columns.length; cc++) {
+	  		var column = this.props.columns[cc];
+	  		var cloneColumn = {
+	  			left: this.maxWidth, display: true
+	  		};
+	  		for (var p in column) {
+	  			cloneColumn[p] = column[p];
+	  		}
+	  		this.columns.push(cloneColumn);
+	  		if (cloneColumn.display) {
+	  			this.maxWidth += column.width;
+	  		}
+	  }
+	  this.state = {custom: true};
+  }
+  getColumnPositions() {
 	  this.maxWidth = 0;
   	  for (var cc=0; cc<this.columns.length; cc++) {
   	  		var column = this.columns[cc];
@@ -433,66 +474,49 @@ GridPaneTable.Table = React.createClass({
   	  // Because this will reset the state, and this was caused by resetting
   	  // the colIndex state!!!
   	  this.resize(this, this.element);
-  },
-  getInitialState: function () {
-	  this.service = new GridPaneTable.Service();
-	  this.maxHeight = this.props.rowHeight * this.props.numRows;
-  	  this.columns = [];
-	  this.maxWidth = 0;
-	  this.optionsLink = null;
-  	  for (var cc=0; cc<this.props.columns.length; cc++) {
-  	  		var column = this.props.columns[cc];
-  	  		var cloneColumn = {
-  	  			left: this.maxWidth, display: true
-  	  		};
-  	  		for (p in column) {
-  	  			cloneColumn[p] = column[p];
-  	  		}
-  	  		this.columns.push(cloneColumn);
-  	  		if (cloneColumn.display) {
-  	  			this.maxWidth += column.width;
-  	  		}
-  	  }
-  	  return {custom: true};
-  },
-  setHeader: function (elt) {
+  }
+  setHeader (elt) {
   	this.header = elt;
-  },
-  createRowProps: function(custom) {
-  	  var rowProps = {};
-  	  var rr = 0;
-  	  rowProps.numRows = this.props.numRows;
+  }
+  createRowProps(custom) {
+	  var rowProps = {};
+	  var rr = 0;
+	  rowProps.numRows = this.props.numRows;
 	  rowProps.rowHeight = GridPaneTable.DEFAULT_ROW_HEIGHT;
 	  if (this.props.rowHeight) {
 			rowProps.rowHeight = this.props.rowHeight;
 	  }
-  	  rowProps.rowClass = "gridpanetable-row-default";
-  	  var props = this.props;
-  	  if (props.evenClass && props.evenClass!=null && props.evenClass.length>0) {
-  	  		rowProps.evenClass = props.evenClass;
-  	  }
-  	  if (props.oddClass && props.oddClass!=null && props.oddClass.length>0) {
-  	  		rowProps.oddClass = props.oddClass;
-  	  }
-  	  return rowProps;
-  },
-  setBody: function (elt) {
+	  rowProps.rowClass = "gridpanetable-row-default";
+	  var props = this.props;
+	  if (props.evenClass && props.evenClass!=null && props.evenClass.length>0) {
+	  		rowProps.evenClass = props.evenClass;
+	  }
+	  if (props.oddClass && props.oddClass!=null && props.oddClass.length>0) {
+	  		rowProps.oddClass = props.oddClass;
+	  }
+	  return rowProps;
+  }
+  setBody (elt) {
   	this.body = elt;
-  },
-  createCaption: function() {
-  	  if (this.props.caption) {
-  	  	  var captionProps = {title: GridPaneTable.WHITE_SPACE, 
-  	  	  	gpTable: this, columns: this.columns};
-  	  	  if (this.props.caption.title) {
-  	  	  	  captionProps.title = this.props.caption.title;
-  	  	  }
-  	  	  return React.createElement(GridPaneTable.Caption, captionProps, null)
-  	  }
-  	  else {
-  	  	  return null;
-  	  }
-  },
-  createHeader: function () {
+  }
+  createCaption() {
+	  if (this.props.caption) {
+	  	  var captionProps = {title: GridPaneTable.WHITE_SPACE,
+	  	  	gpTable: this, columns: this.columns};
+	  	  if (this.props.caption.title) {
+	  	  	  captionProps.title = this.props.caption.title;
+	  	  }
+	  	  if (this.props.caption.optionsTitle) {
+	  	  	  captionProps.optionsTitle = this.props.caption.optionsTitle;
+	  	  }
+	  	  return React.createElement(GridPaneTableCaption, captionProps, null)
+	  }
+	  else {
+	  	  return null;
+	  }
+  }
+  createHeader () {
+		var parentTable = this;
 		var rowHeight = GridPaneTable.DEFAULT_ROW_HEIGHT;
 		var headerClass = "gridpanetable-header-default";
 		if (this.props.headerRowHeight) {
@@ -501,24 +525,25 @@ GridPaneTable.Table = React.createClass({
 		if (this.props.headerClass && this.props.headerClass!=null  && this.props.headerClass.length>0) {
 			headerClass = this.props.headerClass;
 		}
-  	  	return React.createElement(GridPaneTable.Header, 
-  	  		{columns: this.columns, service: this.service, height: rowHeight, headerClass: headerClass, ref: this.setHeader}, null)
-  },
-  setElement: function(elt) {
+  	return React.createElement(GridPaneTableHeader,
+  		{columns: this.columns, service: this.service, height: rowHeight,
+				headerClass: headerClass, ref: function(elt) { parentTable.setHeader(elt); }});
+  }
+  setElement(elt) {
   	  this.element = elt;
-  },
-  componentWillUpdate: function() {
+  }
+  componentWillUpdate() {
   	  if (this.colIndex!=null && this.colIndex > -1) {
   	  	  this.columns[this.colIndex].display = this.newDisplay;
   	  	  this.getColumnPositions();
   	  }
-  },
-  updateColumn: function(colIndex, newDisplay) {
+  }
+  updateColumn(colIndex, newDisplay) {
   	  this.colIndex = colIndex;
   	  this.newDisplay = newDisplay;
   	  this.setState({colIndex: colIndex, newDisplay: newDisplay});
-  },
-  resize: function(me, element, isResizeEvent) {
+  }
+  resize(me, element, isResizeEvent) {
   	me.header.setState({custom: true});
   	me.body.setState({custom: true});
   	var body = me.service.getBody();
@@ -573,19 +598,19 @@ GridPaneTable.Table = React.createClass({
   		me.optionsLink.moveOptions(pRect.right - 16);
   	}
   	me.service.onScroll(me.element, custom);
-  	  
-  },
-  render: function() {
+  }
+  render() {
   	  return (
-  	  	React.createElement("table", {ref: this.setElement, className: "gridpanetable-table"},
-  	  		this.createCaption()
-  	  		,this.createHeader()
-  	      ,React.createElement(GridPaneTable.Body, {rowProps: this.createRowProps(), columns: this.columns,
-  	       service: this.service, ref: this.setBody}, null)
+  	  	<table ref={(elt) => this.setElement(elt)} className="gridpanetable-table">
+  	  		{this.createCaption()}
+  	  		{this.createHeader()}
+  	      <GridPaneTableBody rowProps={this.createRowProps()} columns={this.columns}
+  	       service={this.service} ref={(elt) => this.setBody(elt)}>
+				 </GridPaneTableBody>
+			 </table>
    	)
-  	  )
-  },
-  componentDidMount: function() {
+  }
+  componentDidMount() {
   	  var me = this;
   	  var elt = this.element;
   	  this.resizeMe = function() {
@@ -613,8 +638,8 @@ GridPaneTable.Table = React.createClass({
   	  }
   	  body.addEventListener("scroll",this.scrollMe);
   	  this.resizeMe();
-  },
-  conponentWillUnmount: function () {
-  	window.removeEventListener("resize", this.resizeMe);
   }
-});
+  conponentWillUnmount () {
+  	window.removeEventListener("resize", this.resizeMe);
+	}
+}

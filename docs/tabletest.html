@@ -9,8 +9,8 @@ BS"D
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/gridpanetable.min.css">
         <link rel="stylesheet" href="css/testtable.css">
-        <script src ="lib/react.min.js"></script>
-        <script src ="lib/react-dom.min.js"></script>
+        <script src ="lib/react.development.js"></script>
+        <script src ="lib/react-dom.development.js"></script>
     </head>
     <body style="height: 100%;">
         <div id="appHeader">GridPaneTable Demo</div>
@@ -20,9 +20,10 @@ BS"D
         	</div>
         	<div style="float: left; width: 90%;" id="gridcell">Loading ...</div>
         </div>
-        
+
         <!--script src="table.js"></script-->
         <script src="lib/gridpanetable.min.js"></script>
+        <script src="lib/demo.js"></script>
         <script type="text/javascript">
         var numRows = 30;
         var columns = [];
@@ -45,13 +46,6 @@ BS"D
         	}
         	tableData.push(row);
         }
-        var RightDiv = React.createClass({
-        	render: function() {
-        		return (
-        			React.createElement("div", {className: "testtable-right"}, this.props.value)
-        		)
-        	}
-        });
         function getCell(arg) {
         	return tableData[arg.rowIndex][arg.columnIndex][arg.column.property];
        	}
@@ -59,7 +53,7 @@ BS"D
        		var age = getCell(arg);
        		return React.createElement(RightDiv, {value: age}, null);
        	}
-       	
+
        	var sortableTable = null;
        	function compareAge(rec1, rec2) {
        		var qA = rec1[ageColumn].value;
@@ -72,7 +66,7 @@ BS"D
        		}
        		return 0;
        	}
-       	
+
        	function compareAgeR(rec1, rec2) {
        		var qA = rec1[ageColumn].value;
        		var qB = rec2[ageColumn].value;
@@ -84,7 +78,7 @@ BS"D
        		}
        		return 0;
        	}
-       	
+
        	function sortData(dir) {
        		if (dir == "UP") {
        			tableData.sort(compareAge);
@@ -93,29 +87,7 @@ BS"D
        			tableData.sort(compareAgeR)
        		}
        	}
-       	
-       	var AgeHeader = React.createClass({
-       		getInitialState: function() {
-       			return {indicator: ""};
-       		},
-       		sort: function() {
-       			if (!this.sortDir || this.sortDir==null || this.sortDir == "DOWN") {
-       				this.sortDir = "UP";
-       				this.setState({indicator: "+"});
-       			}
-       			else {
-       				this.sortDir = "DOWN"
-       				this.setState({indicator: "-"});
-       			}
-       			sortableTable.updateSort(this.sortDir);
-       		},
-       		render: function() {
-       			return (
-       				React.createElement("span", {onClick: this.sort},
-       					"Age ", this.state.indicator)
-       			)
-       		}
-       	});
+
 
        	for (var cc=0; cc<numColumns; cc++) {
        		var colName = "Column " + cc;
@@ -125,46 +97,20 @@ BS"D
        			column.displayName = React.createElement(AgeHeader, {}, null);
        			column.cellContentGetter = getAge;
        		}
+       		if (cc==5) {
+       			column.display = false;
+       		}
        		columns.push(column);
        	}
        	columns[0].fixed = true;
        	columns[0].noHide = true;
        	columns[1].fixed = true;
-       	
+
        	columns[numColumns - 1].fixedRight = true;
-       	var SortableTable = React.createClass({
-       		getInitialState: function () {
-       			sortableTable = this;
-       			return {sort: "none", columns: columns};
-       		},
-       		updateSort: function(dir) {
-       			sortData(dir);
-       			this.setState({sort: dir});
-       		},
-       		render: function() {
-       			return (
-					React.createElement(GridPaneTable.Table, 
-						{
-							columns: columns
-							,caption: true
-							,minWidth: 350
-							,sortDir: this.state.sort
-							//,tableHeight: 250
-							,numRows: tableData.length
-							,verticalResizer: {remainingHeight: 40, minHeight: 250}
-							,headerRowHeight: 40
-							//,rowHeight: 60
-							,headerClass: "testtable-header"
-							,evenClass: "testtable-even"
-							,oddClass: "testtable-odd"
-						})
-       			)
-       		}
-       	})
-        	ReactDOM.render(
-        		React.createElement(SortableTable, {})
-        		,document.getElementById("gridcell")
-        	);
+      	ReactDOM.render(
+      		React.createElement(SortableTable, {})
+      		,document.getElementById("gridcell")
+      	);
         </script>
     </body>
 </html>
