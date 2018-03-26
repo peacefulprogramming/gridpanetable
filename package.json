@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "rimraf build; make-dir build; npx babel src --out-dir build",
     "compile:demo": "npx babel docs/src/demo.jsx > docs/lib/demo.js",
-    "compress": "uglifyjs build/gridpanetable.js > download/gridpanetable.min.js; minify css/gridpanetable.css > download/gridpanetable.min.css",
+    "compress": "uglifyjs build/gridpanetable.js > download/gridpanetable.min.js; minify css/gridpanetable.css; cp css/gridpanetable.min.css download/",
     "copytodemo": "cp download/gridpanetable.min.js docs/lib; cp download/gridpanetable.min.css docs/css",
     "dist": "rimraf download; make-dir download; npm run compile; npm run compile:demo; npm run compress; npm run copytodemo; rimraf build"
   },
