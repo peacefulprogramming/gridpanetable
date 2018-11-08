@@ -28,7 +28,9 @@ Only requires the gridpanetable.min.js and gridpanetable.css files included in t
 
 To use the component, include the following line in your code
 
+``````javascript
 	<GridPaneTableTable {options}></GridPaneTableTable>
+```````
 
 ## API
 

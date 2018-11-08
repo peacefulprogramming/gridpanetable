@@ -86,7 +86,11 @@ BS"D
        		if (dir == "DOWN") {
        			tableData.sort(compareAgeR)
        		}
-       	}
+		}
+		   
+		function showCell(arg) {
+			alert("Row " + arg.rowIndex + " Column " + arg.columnIndex + " clicked!");
+		}
 
 
        	for (var cc=0; cc<numColumns; cc++) {
@@ -96,7 +100,10 @@ BS"D
        			column.referenceName = "Age";
        			column.displayName = React.createElement(AgeHeader, {}, null);
        			column.cellContentGetter = getAge;
-       		}
+			}
+			if (cc==2 || cc==3) {
+				column.onCellClick = showCell;
+			}   
        		if (cc==5) {
        			column.display = false;
        		}

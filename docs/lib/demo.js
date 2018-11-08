@@ -104,6 +104,11 @@ var SortableTable = function (_React$Component3) {
       return { remainingHeight: 40, minHeight: 250 };
     }
   }, {
+    key: "showRow",
+    value: function showRow(i) {
+      alert("Row " + i + " clicked!");
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement(GridPaneTableTable, {
@@ -116,7 +121,8 @@ var SortableTable = function (_React$Component3) {
         headerRowHeight: "40",
         headerClass: "testtable-header",
         evenClass: "testtable-even",
-        oddClass: "testtable-odd" });
+        oddClass: "testtable-odd"
+      });
     }
   }]);
 

@@ -2,10 +2,12 @@
 
 .testtable-even {
 	background-color: lightgrey;
+	cursor: pointer;
 }
 
 .testtable-odd {
 	background-color: lightblue;
+	cursor: pointer;
 }
 
 .testtable-header {

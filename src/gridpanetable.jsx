@@ -65,9 +65,9 @@ class GridPaneTableService {
 }
 
 class GridPaneTableCell extends React.Component {
-	constructor(props) {
-		super(props);
-	}
+  constructor(props) {
+	super(props);
+  }
   setElement(elt) {
   	  this.element = elt;
   }
@@ -136,11 +136,23 @@ class GridPaneTableCell extends React.Component {
   componentDidUpdate() {
   	this.setStyles();
   }
+  onCellClick(evt) {
+	  if (this.props.column.onCellClick && this.props.column.onCellClick!=null) {
+		  var arg = {
+			  rowIndex: this.props.rowIndex,
+			  columnIndex: this.props.columnIndex,
+			  cell: this.element
+		  };
+		  this.props.column.onCellClick(arg);
+	  }
+  } 
   render() {
-		var cell = this;
-		return React.createElement(this.props.cellType,
-  	  {ref: function(elt) { cell.setElement(elt); }, className: this.getCellClass()},
-  	  this.getCellContent());
+	var cell = this;
+	return React.createElement(this.props.cellType,
+		{ref: function(elt) { cell.setElement(elt); },
+		onClick: function(evt)  { return cell.onCellClick(evt); },
+		className: this.getCellClass()},
+  		this.getCellContent());
   }
 }
 
@@ -172,7 +184,8 @@ class GridPaneTableRow extends React.Component {
   	  			width: column.width,
   	  			left: column.left,
   	  			name: column.name,
-  	  			property: column.property,
+				property: column.property,
+				onCellClick: column.onCellClick,	
   	  			transparent: true
   	  		};
 			columns.push(
@@ -221,11 +234,17 @@ class GridPaneTableRow extends React.Component {
   componentDidUpdate() {
   	this.setStyles();
   }
+  onRowClick() {
+	  if (this.props.onRowClick && this.props.onRowClick!=null) {
+		  this.props.onRowClick(this.props.rowIndex);
+	  } 
+  }
   render() {
   	  return (
-  	  	  <tr ref={(elt) => this.setElement(elt)} className={this.props.rowClass}>
-						{this.createColumns()}
-					</tr>
+		<tr onClick={(evt) => { return this.onRowClick(evt) }}
+			ref={(elt) => this.setElement(elt)} className={this.props.rowClass}>
+			{this.createColumns()}
+		</tr>
   	  )
   }
 }
@@ -262,9 +281,9 @@ class GridPaneTableBody extends React.Component {
   	   rows.push(
   	      	  React.createElement(GridPaneTableRow,
   	      	  	  {columns: columns, key: "row" + rr, rowIndex: rr, height: props.rowHeight,
-  	      	  	  rowClass: rowClass, custom: this.state.custom,
-  	      	  	  defaultWidth: this.state.defaultWidth, width: this.state.width},
-  	      	  	  null
+					rowClass: rowClass, custom: this.state.custom,
+					onRowClick: props.onRowClick,
+  	      	  		defaultWidth: this.state.defaultWidth, width: this.state.width}
   	      	  )
   	   );
   	  }
@@ -440,12 +459,12 @@ class GridPaneTableCaption extends React.Component {
 class GridPaneTableTable extends React.Component {
 	constructor(props) {
 		super(props);
-	  this.service = new GridPaneTableService();
-	  this.maxHeight = this.props.rowHeight * this.props.numRows;
-  	this.columns = [];
-	  this.maxWidth = 0;
-	  this.optionsLink = null;
-	  for (var cc=0; cc<this.props.columns.length; cc++) {
+		this.service = new GridPaneTableService();
+		this.maxHeight = this.props.rowHeight * this.props.numRows;
+  		this.columns = [];
+		this.maxWidth = 0;
+		this.optionsLink = null;
+		for (var cc=0; cc<this.props.columns.length; cc++) {
 	  		var column = this.props.columns[cc];
 	  		var cloneColumn = {
 	  			left: this.maxWidth, display: true
@@ -457,8 +476,8 @@ class GridPaneTableTable extends React.Component {
 	  		if (cloneColumn.display) {
 	  			this.maxWidth += column.width;
 	  		}
-	  }
-	  this.state = {custom: true};
+	  	}
+	  	this.state = {custom: true};
   }
   getColumnPositions() {
 	  this.maxWidth = 0;
@@ -487,6 +506,7 @@ class GridPaneTableTable extends React.Component {
 			rowProps.rowHeight = this.props.rowHeight;
 	  }
 	  rowProps.rowClass = "gridpanetable-row-default";
+	  rowProps.onRowClick = this.props.onRowClick;
 	  var props = this.props;
 	  if (props.evenClass && props.evenClass!=null && props.evenClass.length>0) {
 	  		rowProps.evenClass = props.evenClass;

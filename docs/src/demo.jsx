@@ -47,6 +47,9 @@ class SortableTable extends React.Component {
   getVerticalResizer() {
     return {remainingHeight: 40, minHeight: 250};
   }
+  showRow(i) {
+    alert("Row " + i + " clicked!");
+  }
   render() {
     return (
       <GridPaneTableTable
@@ -59,7 +62,10 @@ class SortableTable extends React.Component {
         headerRowHeight="40"
         headerClass="testtable-header"
         evenClass="testtable-even"
-        oddClass="testtable-odd"></GridPaneTableTable>
+        oddClass="testtable-odd"
+        /* onRowClick={this.showRow} */
+        ></GridPaneTableTable>
+        
     )
   }
 }
